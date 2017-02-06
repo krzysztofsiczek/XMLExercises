@@ -1,0 +1,99 @@
+<?xml version ="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://example.net/library/1.0"
+	targetNamespace="http://example.net/library/1.0" elementFormDefault="qualified">
+
+	<xs:element name="name" type="xs:string" />
+	<xs:element name="surname" type="xs:string" />
+	<xs:element name="born" type="xs:date" />
+	<xs:element name="died" type="xs:date" />
+	<xs:element name="title" type="xs:string" />
+	<xs:element name="published">
+		<xs:simpleType>
+			<xs:restriction base="xs:gYear">
+				<xs:maxInclusive value="2017" />
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:element>
+	<xs:element name="isbn">
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:pattern value="\d{3}-\d{1}-\d{2}-\d{6}-\d{1}" />
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:element>
+
+	<xs:element name="author">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="name" />
+				<xs:element ref="surname" />
+				<xs:element ref="born" />
+				<xs:element ref="died" minOccurs="0" />
+			</xs:sequence>
+			<xs:attribute name="id" use="required">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:pattern value="[a][1-9]([0-9])*" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="book">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="title" />
+				<xs:element ref="published" />
+				<xs:element ref="isbn" minOccurs="0" />
+			</xs:sequence>
+			<xs:attribute name="id" use="required">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:pattern value="[b][1-9]([0-9])*" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+			<xs:attribute name="author-id" type="xs:string" use="required" />
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="authors">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="author" maxOccurs="unbounded" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="books">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="book" maxOccurs="unbounded" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="library">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="authors" />
+				<xs:element ref="books" />
+			</xs:sequence>
+		</xs:complexType>
+		<xs:key name="authorId">
+			<xs:selector xpath="./authors/author" />
+			<xs:field xpath="./authors/author/@id" />
+		</xs:key>
+		<xs:keyref name="authorIdRef" refer="authorId">
+			<xs:selector xpath="./books/book" />
+			<xs:field xpath="./books/book/@author-id" />
+		</xs:keyref>
+		<xs:key name="compositeKey">
+			<xs:selector xpath="./books/book" />
+			<xs:field xpath="./books/book/@id" />
+			<xs:field xpath="./books/book/@author-id" />
+		</xs:key>
+	</xs:element>
+
+</xs:schema>
